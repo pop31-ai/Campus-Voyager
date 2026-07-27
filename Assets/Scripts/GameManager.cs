@@ -201,12 +201,6 @@ public class GameManager : MonoBehaviour
 
     void HandleGlobalInput()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            VisitIsland();
-            uiController?.ShowNotification("Visited island!");
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
         {
             ship?.ResetShip();
@@ -229,9 +223,15 @@ public class GameManager : MonoBehaviour
         {
             float dist = Vector3.Distance(ship.transform.position, nearestIsland.Value.position);
             if (dist < nearestIsland.Value.radius + 5f)
+            {
                 uiController?.ShowIslandPrompt(nearestIsland.Value.facultyName);
+                if (Input.GetKeyDown(KeyCode.F))
+                    VisitIsland();
+            }
             else
+            {
                 uiController?.HideIslandPrompt();
+            }
         }
     }
 

@@ -249,6 +249,8 @@ public class IslandGenerator : MonoBehaviour
 
     public IslandData? GetNearestIsland(Vector3 position)
     {
+        if (islandDataList.Count == 0) return null;
+
         IslandData nearest = default;
         float minDist = float.MaxValue;
 
@@ -262,9 +264,7 @@ public class IslandGenerator : MonoBehaviour
             }
         }
 
-        if (minDist < 100f)
-            return nearest;
-        return null;
+        return nearest;
     }
 
     public void ClearIslands()
