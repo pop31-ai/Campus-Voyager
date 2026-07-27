@@ -7,6 +7,7 @@ public class ShipController : MonoBehaviour
     public float turnSpeed = 90f;
     public float acceleration = 10f;
     public float deceleration = 6f;
+    public float waterHeight = 0.5f;
 
     [Header("Tilt")]
     public float maxTiltAngle = 12f;
@@ -38,8 +39,8 @@ public class ShipController : MonoBehaviour
 
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        rb.linearDamping = 2f;
-        rb.angularDamping = 4f;
+        rb.linearDamping = 3f;
+        rb.angularDamping = 5f;
 
         currentYRotation = transform.eulerAngles.y;
         startPosition = transform.position;
@@ -51,6 +52,7 @@ public class ShipController : MonoBehaviour
         HandleInput();
         HandleBoost();
         ApplyTilt();
+        KeepOnWater();
     }
 
     void FixedUpdate()
@@ -85,6 +87,16 @@ public class ShipController : MonoBehaviour
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, Time.deltaTime * tiltSpeed);
         Vector3 euler = transform.eulerAngles;
         transform.rotation = Quaternion.Euler(euler.x, currentYRotation, currentTilt);
+    }
+
+    void KeepOnWater()
+    {
+        Vector3 pos = transform.position;
+        float targetY = waterHeight + 0.6f;
+        pos.y = Mathf.Lerp(pos.y, targetY, Time.deltaTime * 5f);
+        transform.position = pos;
+
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     }
 
     public void ResetShip()
