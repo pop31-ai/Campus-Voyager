@@ -43,8 +43,8 @@ public class ShipController : MonoBehaviour
         }
         rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        rb.drag = 2f;
-        rb.angularDrag = 4f;
+        rb.linearDamping = 2f;
+        rb.angularDamping = 4f;
 
         startPosition = transform.position;
         startRotation = transform.rotation;
@@ -140,7 +140,7 @@ public class ShipController : MonoBehaviour
         transform.position = startPosition;
         transform.rotation = startRotation;
         currentSpeed = 0f;
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
 

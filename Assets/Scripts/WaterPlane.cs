@@ -4,14 +4,10 @@ public class WaterPlane : MonoBehaviour
 {
     [Header("Water Settings")]
     public float size = 500f;
-    public int resolution = 100;
-    public float waveHeight = 0.5f;
-    public float waveSpeed = 1f;
+    public int resolution = 60;
+    public float waveHeight = 0.8f;
+    public float waveSpeed = 1.5f;
     public float waveFrequency = 0.3f;
-
-    [Header("Color")]
-    public Color shallowColor = new Color(0.1f, 0.5f, 0.7f, 0.8f);
-    public Color deepColor = new Color(0.02f, 0.1f, 0.25f, 0.95f);
 
     private MeshFilter mf;
     private MeshRenderer mr;
@@ -54,10 +50,8 @@ public class WaterPlane : MonoBehaviour
                 int i = z * resolution + x;
                 float fx = (float)x / (resolution - 1);
                 float fz = (float)z / (resolution - 1);
-
                 float px = (fx - 0.5f) * size;
                 float pz = (fz - 0.5f) * size;
-
                 baseVertices[i] = new Vector3(px, 0f, pz);
                 animatedVertices[i] = baseVertices[i];
                 normals[i] = Vector3.up;
@@ -87,14 +81,12 @@ public class WaterPlane : MonoBehaviour
         mesh.normals = normals;
         mesh.uv = uvs;
         mesh.triangles = triangles;
-
         mf.mesh = mesh;
     }
 
     void AnimateWaves()
     {
         if (baseVertices == null || mesh == null) return;
-
         float time = Time.time * waveSpeed;
 
         for (int i = 0; i < baseVertices.Length; i++)
@@ -103,7 +95,6 @@ public class WaterPlane : MonoBehaviour
             float wave1 = Mathf.Sin(v.x * waveFrequency + time) * waveHeight;
             float wave2 = Mathf.Sin(v.z * waveFrequency * 0.8f + time * 1.2f) * waveHeight * 0.6f;
             float wave3 = Mathf.Sin((v.x + v.z) * waveFrequency * 0.5f + time * 0.7f) * waveHeight * 0.3f;
-
             animatedVertices[i] = new Vector3(v.x, wave1 + wave2 + wave3, v.z);
         }
 
@@ -114,21 +105,9 @@ public class WaterPlane : MonoBehaviour
 
     void CreateWaterMaterial()
     {
-        Material mat = new Material(Shader.Find("Standard"));
-        mat.SetFloat("_Mode", 3);
-        mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        mat.SetInt("_ZWrite", 0);
-        mat.DisableKeyword("_ALPHATEST_ON");
-        mat.EnableKeyword("_ALPHABLEND_ON");
-        mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        mat.renderQueue = 3000;
-
-        Color c = Color.Lerp(deepColor, shallowColor, 0.5f);
-        mat.color = c;
+        Material mat = MaterialHelper.Create(new Color(0.1f, 0.4f, 0.65f, 0.9f));
         mat.SetFloat("_Glossiness", 0.9f);
         mat.SetFloat("_Metallic", 0.3f);
-
         mr.material = mat;
     }
 

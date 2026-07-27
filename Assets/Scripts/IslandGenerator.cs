@@ -96,8 +96,7 @@ public class IslandGenerator : MonoBehaviour
         mf.mesh = mesh;
         island.GetComponent<MeshCollider>().sharedMesh = mesh;
 
-        Material mat = new Material(Shader.Find("Standard"));
-        mat.color = color;
+        Material mat = MaterialHelper.Create(color);
         mat.SetFloat("_Glossiness", 0.3f);
         mr.material = mat;
 
@@ -198,9 +197,7 @@ public class IslandGenerator : MonoBehaviour
         tree.transform.localPosition = position + Vector3.up * 1.5f;
         tree.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f);
 
-        Material trunkMat = new Material(Shader.Find("Standard"));
-        trunkMat.color = new Color(0.4f, 0.25f, 0.1f);
-        tree.GetComponent<MeshRenderer>().material = trunkMat;
+        tree.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.4f, 0.25f, 0.1f));
 
         GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         crown.name = "Crown";
@@ -208,9 +205,7 @@ public class IslandGenerator : MonoBehaviour
         crown.transform.localPosition = Vector3.up * 1.2f;
         crown.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
 
-        Material crownMat = new Material(Shader.Find("Standard"));
-        crownMat.color = new Color(0.1f, 0.5f + Random.Range(0f, 0.3f), 0.1f);
-        crown.GetComponent<MeshRenderer>().material = crownMat;
+        crown.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.1f, 0.5f + Random.Range(0f, 0.3f), 0.1f));
     }
 
     void AddPath(Transform parent, float radius, int index)
@@ -224,9 +219,7 @@ public class IslandGenerator : MonoBehaviour
         path.transform.localPosition = new Vector3(0f, 0.05f, pathLength * 0.5f);
         path.transform.localScale = new Vector3(pathWidth, 0.1f, pathLength);
 
-        Material pathMat = new Material(Shader.Find("Standard"));
-        pathMat.color = new Color(0.6f, 0.6f, 0.55f);
-        path.GetComponent<MeshRenderer>().material = pathMat;
+        path.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.6f, 0.6f, 0.55f));
         Destroy(path.GetComponent<Collider>());
     }
 
@@ -242,9 +235,7 @@ public class IslandGenerator : MonoBehaviour
         dock.transform.position = dockPos;
         dock.transform.localScale = new Vector3(4f, 0.5f, 8f);
 
-        Material dockMat = new Material(Shader.Find("Standard"));
-        dockMat.color = new Color(0.5f, 0.35f, 0.15f);
-        dock.GetComponent<MeshRenderer>().material = dockMat;
+        dock.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.5f, 0.35f, 0.15f));
 
         for (int i = -1; i <= 1; i += 2)
         {
@@ -252,7 +243,7 @@ public class IslandGenerator : MonoBehaviour
             post.name = "Post";
             post.transform.position = dockPos + new Vector3(i * 1.5f, 1f, 0f);
             post.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f);
-            post.GetComponent<MeshRenderer>().material = dockMat;
+            post.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.5f, 0.35f, 0.15f));
         }
     }
 

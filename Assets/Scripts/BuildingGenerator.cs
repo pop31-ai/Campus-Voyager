@@ -78,9 +78,7 @@ public class BuildingGenerator : MonoBehaviour
         roof.transform.localPosition = new Vector3(0f, h * 0.5f + 0.3f, 0f);
         roof.transform.localScale = new Vector3(w + 0.5f, 0.6f, d + 0.5f);
 
-        Material roofMat = new Material(Shader.Find("Standard"));
-        roofMat.color = new Color(0.3f, 0.3f, 0.35f);
-        roof.GetComponent<MeshRenderer>().material = roofMat;
+        roof.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.3f, 0.3f, 0.35f));
 
         AddDoor(building.transform, w, d);
         AddWindows(building.transform, w, h, d);
@@ -115,9 +113,7 @@ public class BuildingGenerator : MonoBehaviour
         cap.transform.localPosition = new Vector3(0f, towerHeight * 0.5f + 0.5f, 0f);
         cap.transform.localScale = new Vector3(tw * 0.8f, 1f, td * 0.8f);
 
-        Material capMat = new Material(Shader.Find("Standard"));
-        capMat.color = new Color(0.5f, 0.2f, 0.2f);
-        cap.GetComponent<MeshRenderer>().material = capMat;
+        cap.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.5f, 0.2f, 0.2f));
 
         AddWindows(building.transform, tw, towerHeight, td);
 
@@ -145,10 +141,7 @@ public class BuildingGenerator : MonoBehaviour
         dome.transform.localPosition = new Vector3(0f, hallHeight * 0.5f, 0f);
         dome.transform.localScale = new Vector3(w * 1.2f, 1.5f, d * 1.2f);
 
-        Material domeMat = new Material(Shader.Find("Standard"));
-        domeMat.color = new Color(0.4f, 0.4f, 0.45f);
-        domeMat.SetFloat("_Glossiness", 0.8f);
-        dome.GetComponent<MeshRenderer>().material = domeMat;
+        dome.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.4f, 0.4f, 0.45f));
 
         AddDoor(building.transform, w * 1.3f, d * 1.2f);
 
@@ -186,9 +179,7 @@ public class BuildingGenerator : MonoBehaviour
                 0f);
             antenna.transform.localScale = new Vector3(0.1f, 0.5f + i * 0.2f, 0.1f);
 
-            Material antMat = new Material(Shader.Find("Standard"));
-            antMat.color = Color.red;
-            antenna.GetComponent<MeshRenderer>().material = antMat;
+            antenna.GetComponent<MeshRenderer>().material = MaterialHelper.Create(Color.red);
         }
 
         AddWindows(building.transform, w, labHeight, d);
@@ -204,9 +195,7 @@ public class BuildingGenerator : MonoBehaviour
         door.transform.localPosition = new Vector3(0f, -parent.localScale.y * 0.5f + 1.2f, depth * 0.5f + 0.01f);
         door.transform.localScale = new Vector3(1.5f, 2.4f, 0.1f);
 
-        Material doorMat = new Material(Shader.Find("Standard"));
-        doorMat.color = new Color(0.35f, 0.2f, 0.1f);
-        door.GetComponent<MeshRenderer>().material = doorMat;
+        door.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.35f, 0.2f, 0.1f));
     }
 
     void AddWindows(Transform parent, float w, float h, float d)
@@ -230,28 +219,24 @@ public class BuildingGenerator : MonoBehaviour
                     d * 0.5f + 0.01f);
                 windowObj.transform.localScale = new Vector3(0.8f, 1f, 0.05f);
 
-                Material winMat = new Material(Shader.Find("Standard"));
-                winMat.color = new Color(0.6f, 0.8f, 1f);
-                winMat.SetFloat("_Glossiness", 1f);
-                winMat.SetFloat("_Metallic", 0.5f);
-                windowObj.GetComponent<MeshRenderer>().material = winMat;
+                windowObj.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.6f, 0.8f, 1f));
             }
         }
     }
 
     Material GetFacultyMaterial(int index)
     {
-        Material mat = new Material(Shader.Find("Standard"));
+        Color c;
         switch (index % 6)
         {
-            case 0: mat.color = new Color(0.6f, 0.7f, 0.85f); break;
-            case 1: mat.color = new Color(0.85f, 0.65f, 0.6f); break;
-            case 2: mat.color = new Color(0.6f, 0.8f, 0.65f); break;
-            case 3: mat.color = new Color(0.85f, 0.75f, 0.5f); break;
-            case 4: mat.color = new Color(0.75f, 0.6f, 0.8f); break;
-            case 5: mat.color = new Color(0.9f, 0.7f, 0.55f); break;
+            case 0: c = new Color(0.6f, 0.7f, 0.85f); break;
+            case 1: c = new Color(0.85f, 0.65f, 0.6f); break;
+            case 2: c = new Color(0.6f, 0.8f, 0.65f); break;
+            case 3: c = new Color(0.85f, 0.75f, 0.5f); break;
+            case 4: c = new Color(0.75f, 0.6f, 0.8f); break;
+            default: c = new Color(0.9f, 0.7f, 0.55f); break;
         }
-        return mat;
+        return MaterialHelper.Create(c);
     }
 
     public void ClearBuildings()
