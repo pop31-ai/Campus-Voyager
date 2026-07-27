@@ -3,27 +3,24 @@ using UnityEngine;
 public class ShipController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 12f;
-    public float turnSpeed = 45f;
-    public float reverseSpeed = 6f;
-    public float acceleration = 8f;
-    public float deceleration = 5f;
+    public float moveSpeed = 15f;
+    public float turnSpeed = 90f;
+    public float acceleration = 10f;
+    public float deceleration = 6f;
 
-    [Header("Tilt & Bob")]
-    public float maxTiltAngle = 8f;
-    public float tiltSpeed = 2f;
-    public float bobAmplitude = 0.3f;
-    public float bobFrequency = 1.5f;
+    [Header("Tilt")]
+    public float maxTiltAngle = 12f;
+    public float tiltSpeed = 3f;
 
     [Header("Boost")]
-    public float boostMultiplier = 2f;
+    public float boostMultiplier = 2.2f;
     public float boostDuration = 2f;
     public float boostCooldown = 5f;
 
     private float currentSpeed;
     private float currentTurnInput;
-    private float targetTilt;
-    private float bobTimer;
+    private float currentYRotation;
+    private float currentTilt;
     private float boostTimer;
     private float cooldownTimer;
     private bool isBoosting;
@@ -37,15 +34,14 @@ public class ShipController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        if (rb == null)
-        {
-            rb = gameObject.AddComponent<Rigidbody>();
-        }
-        rb.useGravity = false;
+        if (rb == null) rb = gameObject.AddComponent<Rigidbody>();
+
+        rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.linearDamping = 2f;
         rb.angularDamping = 4f;
 
+        currentYRotation = transform.eulerAngles.y;
         startPosition = transform.position;
         startRotation = transform.rotation;
     }
@@ -55,8 +51,6 @@ public class ShipController : MonoBehaviour
         HandleInput();
         HandleBoost();
         ApplyTilt();
-        ApplyBob();
-        ClampPosition();
     }
 
     void FixedUpdate()
@@ -67,43 +61,47 @@ public class ShipController : MonoBehaviour
     void HandleInput()
     {
         float moveInput = Input.GetAxis("Vertical");
-        float turnInput = Input.GetAxis("Horizontal");
+        currentTurnInput = Input.GetAxis("Horizontal");
 
-        currentSpeed = Mathf.Lerp(currentSpeed,
-            moveInput * moveSpeed * (isBoosting ? boostMultiplier : 1f),
-            Time.deltaTime * (moveInput != 0 ? acceleration : deceleration));
-
-        currentTurnInput = turnInput;
+        float targetSpeed = moveInput * moveSpeed * (isBoosting ? boostMultiplier : 1f);
+        float rate = Mathf.Abs(moveInput) > 0.1f ? acceleration : deceleration;
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * rate);
     }
 
     void ApplyMovement()
     {
-        Vector3 forwardMove = transform.forward * currentSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + forwardMove);
+        Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
 
         float turnAmount = currentTurnInput * turnSpeed * Time.fixedDeltaTime;
-        Quaternion turnRotation = Quaternion.Euler(0, turnAmount, 0);
-        rb.MoveRotation(rb.rotation * turnRotation);
+        currentYRotation += turnAmount;
+        Quaternion targetRot = Quaternion.Euler(0f, currentYRotation, 0f);
+        rb.MoveRotation(targetRot);
     }
 
     void ApplyTilt()
     {
-        targetTilt = -currentTurnInput * maxTiltAngle;
-        float currentTilt = transform.localEulerAngles.z;
-        if (currentTilt > 180f) currentTilt -= 360f;
-        float newTilt = Mathf.Lerp(currentTilt, targetTilt, Time.deltaTime * tiltSpeed);
-        transform.localEulerAngles = new Vector3(
-            transform.localEulerAngles.x,
-            transform.localEulerAngles.y,
-            newTilt);
+        float targetTilt = -currentTurnInput * maxTiltAngle;
+        currentTilt = Mathf.Lerp(currentTilt, targetTilt, Time.deltaTime * tiltSpeed);
+        Vector3 euler = transform.eulerAngles;
+        transform.rotation = Quaternion.Euler(euler.x, currentYRotation, currentTilt);
     }
 
-    void ApplyBob()
+    public void ResetShip()
     {
-        bobTimer += Time.deltaTime * bobFrequency;
-        float bobOffset = Mathf.Sin(bobTimer) * bobAmplitude * Mathf.Abs(currentSpeed) / moveSpeed;
-        Vector3 pos = transform.position;
-        pos.y = Mathf.Lerp(pos.y, pos.y + bobOffset, Time.deltaTime * 3f);
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+        currentSpeed = 0f;
+        currentYRotation = startRotation.eulerAngles.y;
+        currentTilt = 0f;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
+    public float GetBoostCooldownNormalized()
+    {
+        if (boostCooldown <= 0f) return 0f;
+        return cooldownTimer / boostCooldown;
     }
 
     void HandleBoost()
@@ -126,26 +124,5 @@ public class ShipController : MonoBehaviour
 
         if (cooldownTimer > 0)
             cooldownTimer -= Time.deltaTime;
-    }
-
-    void ClampPosition()
-    {
-        Vector3 pos = transform.position;
-        pos.y = Mathf.Clamp(pos.y, 0.5f, 3f);
-        transform.position = pos;
-    }
-
-    public void ResetShip()
-    {
-        transform.position = startPosition;
-        transform.rotation = startRotation;
-        currentSpeed = 0f;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-    }
-
-    public float GetBoostCooldownNormalized()
-    {
-        return cooldownTimer / boostCooldown;
     }
 }
