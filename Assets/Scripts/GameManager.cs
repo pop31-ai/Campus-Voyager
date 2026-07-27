@@ -96,52 +96,61 @@ public class GameManager : MonoBehaviour
         GameObject shipObj = new GameObject("Ship");
         shipObj.transform.position = new Vector3(0f, 2f, 0f);
 
+        // Основной корпус — плоская лодка
         GameObject hull = GameObject.CreatePrimitive(PrimitiveType.Cube);
         hull.name = "Hull";
         hull.transform.SetParent(shipObj.transform);
-        hull.transform.localPosition = Vector3.zero;
-        hull.transform.localScale = new Vector3(2.5f, 1.2f, 6f);
+        hull.transform.localPosition = new Vector3(0f, 0f, 0f);
+        hull.transform.localScale = new Vector3(2.5f, 0.5f, 6f);
         hull.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.55f, 0.3f, 0.1f));
+        Destroy(hull.GetComponent<Collider>());
 
+        // Палуба сверху корпуса
         GameObject deck = GameObject.CreatePrimitive(PrimitiveType.Cube);
         deck.name = "Deck";
         deck.transform.SetParent(shipObj.transform);
-        deck.transform.localPosition = new Vector3(0f, 0.7f, -0.5f);
-        deck.transform.localScale = new Vector3(2.2f, 0.15f, 4.5f);
-        deck.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.65f, 0.45f, 0.2f));
+        deck.transform.localPosition = new Vector3(0f, 0.3f, 0f);
+        deck.transform.localScale = new Vector3(2.3f, 0.05f, 5.8f);
+        deck.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.7f, 0.5f, 0.25f));
+        Destroy(deck.GetComponent<Collider>());
 
+        // Каюта на палубе
         GameObject cabin = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cabin.name = "Cabin";
         cabin.transform.SetParent(shipObj.transform);
-        cabin.transform.localPosition = new Vector3(0f, 1.4f, -1.5f);
-        cabin.transform.localScale = new Vector3(1.8f, 1.2f, 2f);
+        cabin.transform.localPosition = new Vector3(0f, 0.7f, -1.2f);
+        cabin.transform.localScale = new Vector3(1.6f, 0.7f, 1.8f);
         cabin.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.7f, 0.55f, 0.3f));
+        Destroy(cabin.GetComponent<Collider>());
 
+        // Мачта — из каюты вверх
         GameObject mast = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         mast.name = "Mast";
         mast.transform.SetParent(shipObj.transform);
-        mast.transform.localPosition = new Vector3(0f, 2.5f, 0.5f);
-        mast.transform.localScale = new Vector3(0.15f, 2.5f, 0.15f);
+        mast.transform.localPosition = new Vector3(0f, 2.2f, 0.5f);
+        mast.transform.localScale = new Vector3(0.1f, 2f, 0.1f);
         mast.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.4f, 0.25f, 0.1f));
+        Destroy(mast.GetComponent<Collider>());
 
+        // Парус — рядом с мачтой
         GameObject sail = GameObject.CreatePrimitive(PrimitiveType.Cube);
         sail.name = "Sail";
-        sail.transform.SetParent(mast.transform);
-        sail.transform.localPosition = new Vector3(0.6f, 0.3f, 0f);
-        sail.transform.localScale = new Vector3(0.02f, 2f, 1.5f);
+        sail.transform.SetParent(shipObj.transform);
+        sail.transform.localPosition = new Vector3(0.5f, 2f, 0.5f);
+        sail.transform.localScale = new Vector3(0.02f, 1.8f, 1.3f);
         sail.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.95f, 0.9f, 0.8f));
+        Destroy(sail.GetComponent<Collider>());
 
+        // Флаг на мачте
         GameObject flag = GameObject.CreatePrimitive(PrimitiveType.Cube);
         flag.name = "Flag";
-        flag.transform.SetParent(mast.transform);
-        flag.transform.localPosition = new Vector3(0.4f, 1.2f, 0f);
-        flag.transform.localScale = new Vector3(0.02f, 0.5f, 0.8f);
+        flag.transform.SetParent(shipObj.transform);
+        flag.transform.localPosition = new Vector3(0.4f, 3.2f, 0.5f);
+        flag.transform.localScale = new Vector3(0.02f, 0.4f, 0.7f);
         flag.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.8f, 0.2f, 0.15f));
+        Destroy(flag.GetComponent<Collider>());
 
         shipObj.AddComponent<ShipController>();
-
-        Rigidbody rb = shipObj.GetComponent<Rigidbody>();
-        rb.useGravity = true;
 
         return shipObj;
     }
