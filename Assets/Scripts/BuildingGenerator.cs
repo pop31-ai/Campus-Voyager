@@ -210,8 +210,8 @@ public class BuildingGenerator : MonoBehaviour
         {
             for (int win = 0; win < windowsPerFloor; win++)
             {
-                float fx = (float)win / (windowsPerFloor - 1) - 0.5f;
-                float fy = (float)floor / floors - 0.3f;
+                float fx = windowsPerFloor > 1 ? (float)win / (windowsPerFloor - 1) - 0.5f : 0f;
+                float fy = (float)floor / Mathf.Max(1, floors) - 0.3f;
 
                 GameObject windowObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 windowObj.name = "Window";
@@ -223,6 +223,7 @@ public class BuildingGenerator : MonoBehaviour
                 windowObj.transform.localScale = new Vector3(0.8f, 1f, 0.05f);
 
                 windowObj.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.6f, 0.8f, 1f));
+                Destroy(windowObj.GetComponent<Collider>());
             }
         }
     }
