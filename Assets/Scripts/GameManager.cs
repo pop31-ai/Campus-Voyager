@@ -185,6 +185,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        HandleGlobalInput();
+
         if (!isGameStarted || isPaused) return;
 
         gameTime += Time.deltaTime;
@@ -195,7 +197,28 @@ public class GameManager : MonoBehaviour
         }
 
         CheckIslandProximity();
-        HandlePause();
+    }
+
+    void HandleGlobalInput()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            VisitIsland();
+            uiController?.ShowNotification("Visited island!");
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ship?.ResetShip();
+            uiController?.ShowNotification("Ship reset!");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isPaused = !isPaused;
+            Time.timeScale = isPaused ? 0f : 1f;
+            uiController?.TogglePause(isPaused);
+        }
     }
 
     void CheckIslandProximity()
@@ -218,16 +241,6 @@ public class GameManager : MonoBehaviour
         currentIslandIndex = nearestIsland.Value.index;
         uiController?.ShowNotification($"Добро пожаловать на {nearestIsland.Value.facultyName}!");
         questSystem.CheckQuestProgress(currentIslandIndex);
-    }
-
-    void HandlePause()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            isPaused = !isPaused;
-            Time.timeScale = isPaused ? 0f : 1f;
-            uiController?.TogglePause(isPaused);
-        }
     }
 
     public void AddCoins(int amount)
