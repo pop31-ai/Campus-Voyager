@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     public float gameTime = 0f;
     public int dayNumber = 1;
 
-    private IslandGenerator.IslandData? nearestIsland;
+    public IslandGenerator.IslandData? nearestIsland;
 
     void Awake()
     {

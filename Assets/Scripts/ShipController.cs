@@ -32,8 +32,15 @@ public class ShipController : MonoBehaviour
     private Vector3 startPosition;
     private Quaternion startRotation;
 
+    // Autopilot
+    private bool autopilotActive = false;
+    private Vector3 autopilotTarget;
+    public float autopilotStopDistance = 20f;
+    public float autopilotSpeed = 14f;
+
     public float CurrentSpeed => currentSpeed;
     public bool IsBoosting => isBoosting;
+    public bool IsAutopilot => autopilotActive;
 
     void Start()
     {
@@ -47,6 +54,12 @@ public class ShipController : MonoBehaviour
     {
         HandleInput();
         HandleBoost();
+
+        if (autopilotActive)
+            RunAutopilot();
+        else
+            HandleManualInput();
+
         SmoothMovement();
         SmoothTurn();
         ApplyTilt();
@@ -54,6 +67,31 @@ public class ShipController : MonoBehaviour
     }
 
     void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (autopilotActive)
+            {
+                StopAutopilot();
+            }
+            else
+            {
+                var gm = GameManager.Instance;
+                if (gm != null && gm.nearestIsland.HasValue)
+                {
+                    StartAutopilot(gm.nearestIsland.Value.position);
+                }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && cooldownTimer <= 0 && !isBoosting)
+        {
+            isBoosting = true;
+            boostTimer = boostDuration;
+        }
+    }
+
+    void HandleManualInput()
     {
         float moveInput = Input.GetAxis("Vertical");
         float turnInput = Input.GetAxis("Horizontal");
@@ -63,6 +101,36 @@ public class ShipController : MonoBehaviour
 
         if (Mathf.Abs(turnInput) > 0.01f)
             targetYRotation += turnInput * turnSpeed * Time.deltaTime;
+    }
+
+    public void StartAutopilot(Vector3 target)
+    {
+        autopilotActive = true;
+        autopilotTarget = target;
+        autopilotTarget.y = waterLevel + shipHeight;
+    }
+
+    public void StopAutopilot()
+    {
+        autopilotActive = false;
+    }
+
+    void RunAutopilot()
+    {
+        Vector3 toTarget = autopilotTarget - transform.position;
+        toTarget.y = 0f;
+        float dist = toTarget.magnitude;
+
+        if (dist < autopilotStopDistance)
+        {
+            StopAutopilot();
+            GameManager.Instance?.VisitIsland();
+            return;
+        }
+
+        float targetAngle = Mathf.Atan2(toTarget.x, toTarget.z) * Mathf.Rad2Deg;
+        targetYRotation = targetAngle;
+        targetSpeed = autopilotSpeed * (isBoosting ? boostMultiplier : 1f);
     }
 
     void SmoothMovement()
@@ -78,8 +146,8 @@ public class ShipController : MonoBehaviour
 
     void ApplyTilt()
     {
-        float turnInput = Input.GetAxis("Horizontal");
-        float targetTilt = -turnInput * maxTiltAngle;
+        float tiltInput = autopilotActive ? Mathf.DeltaAngle(currentYRotation, targetYRotation) * 0.02f : Input.GetAxis("Horizontal");
+        float targetTilt = -Mathf.Clamp(tiltInput, -1f, 1f) * maxTiltAngle;
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, Time.deltaTime * tiltSpeed);
         transform.rotation = Quaternion.Euler(0f, currentYRotation, currentTilt);
     }
@@ -93,6 +161,7 @@ public class ShipController : MonoBehaviour
 
     public void ResetShip()
     {
+        StopAutopilot();
         transform.position = startPosition;
         transform.rotation = startRotation;
         currentSpeed = 0f;
@@ -110,12 +179,6 @@ public class ShipController : MonoBehaviour
 
     void HandleBoost()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && cooldownTimer <= 0 && !isBoosting)
-        {
-            isBoosting = true;
-            boostTimer = boostDuration;
-        }
-
         if (isBoosting)
         {
             boostTimer -= Time.deltaTime;
