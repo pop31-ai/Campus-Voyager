@@ -214,8 +214,8 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (ship == null) ship = FindObjectOfType<ShipController>();
-            if (islandGenerator == null) islandGenerator = FindObjectOfType<IslandGenerator>();
+            if (ship == null) ship = FindAnyObjectByType<ShipController>();
+            if (islandGenerator == null) islandGenerator = FindAnyObjectByType<IslandGenerator>();
             if (ship == null || islandGenerator == null) return;
 
             if (ship.IsAutopilot)
