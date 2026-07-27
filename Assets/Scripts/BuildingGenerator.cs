@@ -54,7 +54,10 @@ public class BuildingGenerator : MonoBehaviour
             }
 
             if (building != null)
+            {
+                RemoveAllColliders(building);
                 allBuildings.Add(building);
+            }
         }
     }
 
@@ -246,5 +249,11 @@ public class BuildingGenerator : MonoBehaviour
             if (b != null) Destroy(b);
         }
         allBuildings.Clear();
+    }
+
+    void RemoveAllColliders(GameObject obj)
+    {
+        foreach (var col in obj.GetComponentsInChildren<Collider>())
+            Destroy(col);
     }
 }

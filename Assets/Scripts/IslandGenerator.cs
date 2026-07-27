@@ -90,11 +90,9 @@ public class IslandGenerator : MonoBehaviour
 
         MeshFilter mf = island.AddComponent<MeshFilter>();
         MeshRenderer mr = island.AddComponent<MeshRenderer>();
-        island.AddComponent<MeshCollider>();
 
         Mesh mesh = GenerateIslandMesh(radius);
         mf.mesh = mesh;
-        island.GetComponent<MeshCollider>().sharedMesh = mesh;
 
         Material mat = MaterialHelper.Create(color);
         mat.SetFloat("_Glossiness", 0.3f);
@@ -196,7 +194,7 @@ public class IslandGenerator : MonoBehaviour
         tree.transform.SetParent(parent);
         tree.transform.localPosition = position + Vector3.up * 1.5f;
         tree.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f);
-
+        Destroy(tree.GetComponent<Collider>());
         tree.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.4f, 0.25f, 0.1f));
 
         GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -204,7 +202,7 @@ public class IslandGenerator : MonoBehaviour
         crown.transform.SetParent(tree.transform);
         crown.transform.localPosition = Vector3.up * 1.2f;
         crown.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
-
+        Destroy(crown.GetComponent<Collider>());
         crown.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.1f, 0.5f + Random.Range(0f, 0.3f), 0.1f));
     }
 
@@ -236,6 +234,7 @@ public class IslandGenerator : MonoBehaviour
         dock.transform.localScale = new Vector3(4f, 0.5f, 8f);
 
         dock.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.5f, 0.35f, 0.15f));
+        Destroy(dock.GetComponent<Collider>());
 
         for (int i = -1; i <= 1; i += 2)
         {
@@ -243,6 +242,7 @@ public class IslandGenerator : MonoBehaviour
             post.name = "Post";
             post.transform.position = dockPos + new Vector3(i * 1.5f, 1f, 0f);
             post.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f);
+            Destroy(post.GetComponent<Collider>());
             post.GetComponent<MeshRenderer>().material = MaterialHelper.Create(new Color(0.5f, 0.35f, 0.15f));
         }
     }
