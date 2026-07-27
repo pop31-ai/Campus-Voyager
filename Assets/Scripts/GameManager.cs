@@ -237,9 +237,10 @@ public class GameManager : MonoBehaviour
 
     public void VisitIsland()
     {
-        if (!nearestIsland.HasValue) return;
-        currentIslandIndex = nearestIsland.Value.index;
-        uiController?.ShowNotification($"Добро пожаловать на {nearestIsland.Value.facultyName}!");
+        var nearest = islandGenerator.GetNearestIsland(ship.transform.position);
+        if (!nearest.HasValue) return;
+        currentIslandIndex = nearest.Value.index;
+        uiController?.ShowNotification($"Добро пожаловать на {nearest.Value.facultyName}!");
         questSystem.CheckQuestProgress(currentIslandIndex);
     }
 
