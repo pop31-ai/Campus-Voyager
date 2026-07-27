@@ -214,7 +214,11 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (ship != null && ship.IsAutopilot)
+            if (ship == null) ship = FindObjectOfType<ShipController>();
+            if (islandGenerator == null) islandGenerator = FindObjectOfType<IslandGenerator>();
+            if (ship == null || islandGenerator == null) return;
+
+            if (ship.IsAutopilot)
             {
                 ship.StopAutopilot();
                 uiController?.ShowNotification("Autopilot OFF");
@@ -226,6 +230,10 @@ public class GameManager : MonoBehaviour
                 {
                     ship.StartAutopilot(nearest.Value.position);
                     uiController?.ShowNotification($"Autopilot -> {nearest.Value.facultyName}");
+                }
+                else
+                {
+                    uiController?.ShowNotification("No island found!");
                 }
             }
         }
