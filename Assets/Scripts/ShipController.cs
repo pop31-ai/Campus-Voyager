@@ -68,7 +68,7 @@ public class ShipController : MonoBehaviour
 
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.T))
         {
             if (autopilotActive)
             {
@@ -77,9 +77,14 @@ public class ShipController : MonoBehaviour
             else
             {
                 var gm = GameManager.Instance;
-                if (gm != null && gm.nearestIsland.HasValue)
+                if (gm != null && gm.islandGenerator != null)
                 {
-                    StartAutopilot(gm.nearestIsland.Value.position);
+                    var nearest = gm.islandGenerator.GetNearestIsland(transform.position);
+                    if (nearest.HasValue)
+                    {
+                        StartAutopilot(nearest.Value.position);
+                        gm.uiController?.ShowNotification($"Autopilot -> {nearest.Value.facultyName}");
+                    }
                 }
             }
         }
