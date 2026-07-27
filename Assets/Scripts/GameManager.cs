@@ -201,10 +201,33 @@ public class GameManager : MonoBehaviour
 
     void HandleGlobalInput()
     {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            VisitIsland();
+        }
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             ship?.ResetShip();
             uiController?.ShowNotification("Ship reset!");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.T))
+        {
+            if (ship != null && ship.IsAutopilot)
+            {
+                ship.StopAutopilot();
+                uiController?.ShowNotification("Autopilot OFF");
+            }
+            else
+            {
+                var nearest = islandGenerator.GetNearestIsland(ship.transform.position);
+                if (nearest.HasValue)
+                {
+                    ship.StartAutopilot(nearest.Value.position);
+                    uiController?.ShowNotification($"Autopilot -> {nearest.Value.facultyName}");
+                }
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))

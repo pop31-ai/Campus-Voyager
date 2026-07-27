@@ -68,27 +68,6 @@ public class ShipController : MonoBehaviour
 
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.T))
-        {
-            if (autopilotActive)
-            {
-                StopAutopilot();
-            }
-            else
-            {
-                var gm = GameManager.Instance;
-                if (gm != null && gm.islandGenerator != null)
-                {
-                    var nearest = gm.islandGenerator.GetNearestIsland(transform.position);
-                    if (nearest.HasValue)
-                    {
-                        StartAutopilot(nearest.Value.position);
-                        gm.uiController?.ShowNotification($"Autopilot -> {nearest.Value.facultyName}");
-                    }
-                }
-            }
-        }
-
         if (Input.GetKeyDown(KeyCode.Space) && cooldownTimer <= 0 && !isBoosting)
         {
             isBoosting = true;
