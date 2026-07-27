@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
             uiController?.ShowNotification("Ship reset!");
         }
 
-        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if (ship != null && ship.IsAutopilot)
             {
