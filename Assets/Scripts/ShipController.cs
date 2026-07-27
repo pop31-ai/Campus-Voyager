@@ -3,10 +3,12 @@ using UnityEngine;
 public class ShipController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 15f;
-    public float turnSpeed = 90f;
-    public float acceleration = 10f;
-    public float deceleration = 6f;
+    public float maxSpeed = 18f;
+    public float acceleration = 5f;
+    public float turnSpeed = 80f;
+    public float turnAccel = 4f;
+
+    [Header("Water")]
     public float waterLevel = 0.5f;
     public float shipHeight = 0.8f;
 
@@ -15,13 +17,14 @@ public class ShipController : MonoBehaviour
     public float tiltSpeed = 3f;
 
     [Header("Boost")]
-    public float boostMultiplier = 2.2f;
+    public float boostMultiplier = 2f;
     public float boostDuration = 2f;
     public float boostCooldown = 5f;
 
     private float currentSpeed;
-    private float currentTurnInput;
+    private float targetSpeed;
     private float currentYRotation;
+    private float targetYRotation;
     private float currentTilt;
     private float boostTimer;
     private float cooldownTimer;
@@ -34,10 +37,8 @@ public class ShipController : MonoBehaviour
 
     void Start()
     {
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null) Destroy(rb);
-
         currentYRotation = transform.eulerAngles.y;
+        targetYRotation = currentYRotation;
         startPosition = transform.position;
         startRotation = transform.rotation;
     }
@@ -46,7 +47,8 @@ public class ShipController : MonoBehaviour
     {
         HandleInput();
         HandleBoost();
-        ApplyMovement();
+        SmoothMovement();
+        SmoothTurn();
         ApplyTilt();
         KeepOnWater();
     }
@@ -54,24 +56,30 @@ public class ShipController : MonoBehaviour
     void HandleInput()
     {
         float moveInput = Input.GetAxis("Vertical");
-        currentTurnInput = Input.GetAxis("Horizontal");
+        float turnInput = Input.GetAxis("Horizontal");
 
-        float targetSpeed = moveInput * moveSpeed * (isBoosting ? boostMultiplier : 1f);
-        float rate = Mathf.Abs(moveInput) > 0.1f ? acceleration : deceleration;
-        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * rate);
+        float speedMult = isBoosting ? boostMultiplier : 1f;
+        targetSpeed = moveInput * maxSpeed * speedMult;
+
+        if (Mathf.Abs(turnInput) > 0.01f)
+            targetYRotation += turnInput * turnSpeed * Time.deltaTime;
     }
 
-    void ApplyMovement()
+    void SmoothMovement()
     {
-        Vector3 move = transform.forward * currentSpeed * Time.deltaTime;
-        transform.position += move;
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * acceleration);
+        transform.position += transform.forward * currentSpeed * Time.deltaTime;
+    }
 
-        currentYRotation += currentTurnInput * turnSpeed * Time.deltaTime;
+    void SmoothTurn()
+    {
+        currentYRotation = Mathf.LerpAngle(currentYRotation, targetYRotation, Time.deltaTime * turnAccel * 3f);
     }
 
     void ApplyTilt()
     {
-        float targetTilt = -currentTurnInput * maxTiltAngle;
+        float turnInput = Input.GetAxis("Horizontal");
+        float targetTilt = -turnInput * maxTiltAngle;
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, Time.deltaTime * tiltSpeed);
         transform.rotation = Quaternion.Euler(0f, currentYRotation, currentTilt);
     }
@@ -88,7 +96,9 @@ public class ShipController : MonoBehaviour
         transform.position = startPosition;
         transform.rotation = startRotation;
         currentSpeed = 0f;
+        targetSpeed = 0f;
         currentYRotation = startRotation.eulerAngles.y;
+        targetYRotation = currentYRotation;
         currentTilt = 0f;
     }
 
